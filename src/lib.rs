@@ -1,4 +1,5 @@
 pub mod client;
+pub mod response;
 
 #[cfg(test)]
 mod test {
@@ -19,12 +20,12 @@ mod test {
 
     fn client() -> NPClient {
         let config = parse_config();
-        NPClient::new(config.api)
+        NPClient::new(config.api.as_str())
     }
 
     fn sandbox_client() -> NPClient {
         let config = parse_config();
-        NPClient::new(config.sandboxapi)
+        NPClient::new(config.sandboxapi.as_str())
     }
 
     #[test]
@@ -36,4 +37,38 @@ mod test {
     fn verify_sandbox_client() {
         sandbox_client();
     }
+
+    #[tokio::test]
+    async fn get_status() {
+        let c = client();
+
+        let status = c.status().await.unwrap();
+
+        assert_eq!(status.message, "OK".to_string())
+    }
+
+    #[tokio::test]
+    async fn get_currencies() {
+        let c = client();
+
+        // panics if not error
+        c.currencies().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn get_full_currencies() {
+        let c = client();
+
+        // panics if not error
+        let currencies = c.full_currencies().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn get_currencies() {
+        let c = client();
+
+        // panics if not error
+        c.currencies().await.unwrap();
+    }
+
 }
