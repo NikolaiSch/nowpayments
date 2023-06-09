@@ -52,7 +52,7 @@ mod test {
         let c = client();
 
         // panics if not error
-        c.currencies().await.unwrap();
+        c.get_currencies().await.unwrap();
     }
 
     #[tokio::test]
@@ -60,15 +60,22 @@ mod test {
         let c = client();
 
         // panics if not error
-        let currencies = c.full_currencies().await.unwrap();
+        c.get_full_currencies().await.unwrap();
     }
 
     #[tokio::test]
-    async fn get_currencies() {
+    async fn get_checked_currencies() {
         let c = client();
 
         // panics if not error
-        c.currencies().await.unwrap();
+        c.get_checked_currencies().await.unwrap();
     }
 
+    #[tokio::test]
+    async fn get_min_payment_amount() {
+        let c = client();
+
+        // panics if not error
+        c.get_min_payment_amount("eth", "btc").await.unwrap();
+    }
 }

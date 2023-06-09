@@ -1,38 +1,40 @@
-use std::fmt::Display;
 use std::fmt::format;
+use std::fmt::Display;
 
-use reqwest::Client;
-use reqwest::Request;
-use anyhow::Result;
-use reqwest::header;
 use crate::response::currencies::Currencies;
 use crate::response::currencies::FullCurrencies;
+use crate::response::currencies::SelectedCurrencies;
+use crate::response::payments::MinPaymentAmount;
 use crate::response::status::Status;
-
-
-
+use anyhow::Result;
+use reqwest::header;
+use reqwest::Client;
+use reqwest::Request;
 
 static BASE_URL: &str = "https://api.nowpayments.io/v1/";
 static BASE_SANDBOX_URL: &str = "https://api-sandbox.nowpayments.io/v1/";
 static USERAGENT: &str = concat!("rust/nowpayments/", "0.1.0");
 
-
 pub struct NPClient {
     api_key: String,
     base_url: &'static str,
 
-    client: reqwest::Client
+    client: reqwest::Client,
 }
 
 impl NPClient {
     pub fn new(api_key: &str) -> Self {
         let mut headers = header::HeaderMap::new();
         headers.insert("X-API-KEY", header::HeaderValue::from_str(api_key).unwrap());
-        
+
         Self {
             api_key: api_key.to_string(),
             base_url: BASE_URL,
-            client: reqwest::ClientBuilder::new().user_agent(USERAGENT).default_headers(headers).build().unwrap()
+            client: reqwest::ClientBuilder::new()
+                .user_agent(USERAGENT)
+                .default_headers(headers)
+                .build()
+                .unwrap(),
         }
     }
 
@@ -43,7 +45,11 @@ impl NPClient {
         Self {
             api_key: api_key.to_string(),
             base_url: BASE_SANDBOX_URL,
-            client: reqwest::ClientBuilder::new().user_agent(USERAGENT).default_headers(headers).build().unwrap()
+            client: reqwest::ClientBuilder::new()
+                .user_agent(USERAGENT)
+                .default_headers(headers)
+                .build()
+                .unwrap(),
         }
     }
 
@@ -53,56 +59,99 @@ impl NPClient {
         let req = self.client.get(endpoint).build()?;
 
         Ok(self.client.execute(req).await?.text().await?)
-
     }
 
     pub async fn status(&self) -> Result<Status> {
         let req = self.get("status").await?;
 
-        let status: Status = serde_json::from_str(req.as_str())?;
-
-        Ok(status)
+        Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn currencies(&self) -> Result<Currencies> {
+    pub async fn get_currencies(&self) -> Result<Currencies> {
         let req = self.get("currencies").await?;
 
-        let currencies: Currencies = serde_json::from_str(req.as_str())?;
-       
-        Ok(currencies)
+        Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn full_currencies(&self) -> Result<FullCurrencies> {
+    pub async fn get_full_currencies(&self) -> Result<FullCurrencies> {
         let req = self.get("full-currencies").await?;
 
-        let currencies: FullCurrencies = serde_json::from_str(req.as_str())?;
-        
-        Ok(currencies)
+        Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn selected_currencies(&self) -> Result<Currencies> {
+    pub async fn get_checked_currencies(&self) -> Result<SelectedCurrencies> {
         let req = self.get("merchant/coins").await?;
 
-        let currencies: Currencies = serde_json::from_str(req.as_str())?;
-       
-        Ok(currencies)
+        Ok(serde_json::from_str(req.as_str())?)
     }
     // TODO
-    pub async fn min_payment_amount(&self, from: impl Display, to: impl Display) -> Result<Currencies> {
+    pub async fn get_min_payment_amount(
+        &self,
+        from: impl Display,
+        to: impl Display,
+    ) -> Result<MinPaymentAmount> {
         let path = format!("min-amount?currency_from={}&currency_to={}", from, to);
         let req = self.get(path).await?;
 
-        let currencies: Currencies = serde_json::from_str(req.as_str())?;
-       
-        Ok(currencies)
+        Ok(serde_json::from_str(req.as_str())?)
     }
     // TODO
-    pub async fn get_estimated_price(&self, amount: impl Display, from: impl Display, to: impl Display) -> Result<Currencies> {
-        let path = format!("estimate?amount={}&currency_from={}&currency_to={}", amount, from, to);
+    pub async fn get_estimated_price(
+        &self,
+        amount: impl Display,
+        from: impl Display,
+        to: impl Display,
+    ) -> Result<> {
+        let path = format!(
+            "estimate?amount={}&currency_from={}&currency_to={}",
+            amount, from, to
+        );
         let req = self.get(path).await?;
 
-        let currencies: Currencies = serde_json::from_str(req.as_str())?;
-       
-        Ok(currencies)
+        Ok(serde_json::from_str(req.as_str())?)
+    }
+
+    pub async fn get_payment_status(&self, payment_id: impl Display) -> Result<Currencies> {
+        let path = format!("payment/{}", payment_id);
+        let req = self.get(path).await?;
+
+        Ok(serde_json::from_str(req.as_str())?)
+    }
+
+    pub async fn get_list_of_payments(
+        &self,
+        limit: impl Display,
+        page: impl Display,
+        sort_by: impl Display,
+        order_by: impl Display,
+        date_from: impl Display,
+        date_to: impl Display,
+    ) -> Result<Currencies> {
+        let path = format!(
+            "payment/?limit={}&page={}&sortBy={}&orderBy={}&dateFrom={}&dateTo={}",
+            limit, page, sort_by, order_by, date_from, date_to
+        );
+        let req = self.get(path).await?;
+
+        Ok(serde_json::from_str(req.as_str())?)
+    }
+
+    pub async fn get_balance(&self) -> Result<Status> {
+        let req = self.get("balance").await?;
+
+        Ok(serde_json::from_str(req.as_str())?)
+    }
+
+    pub async fn get_payout_status(&self, payout_id: impl Display) -> Result<Currencies> {
+        let path = format!("payout/{}", payout_id);
+        let req = self.get(path).await?;
+
+        Ok(serde_json::from_str(req.as_str())?)
+    }
+
+    pub async fn get_payout_list(&self) -> Result<Status> {
+        let req = self.get("payout").await?;
+
+        Ok(serde_json::from_str(req.as_str())?)
     }
 }
