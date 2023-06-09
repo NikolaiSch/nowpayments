@@ -2,8 +2,6 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 
-
-
 pub type Payouts = Vec<Payout>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -26,9 +24,7 @@ pub struct Payout {
     pub updated_at: Option<String>,
 }
 
-
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AllPayouts {
     pub payouts: Vec<Payout>,
 }
-
