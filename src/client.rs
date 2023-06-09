@@ -1,15 +1,21 @@
 use std::fmt::format;
 use std::fmt::Display;
 
+use crate::response::conversion::AllConversions;
+use crate::response::conversion::SingleConversion;
 use crate::response::currencies::Currencies;
 use crate::response::currencies::FullCurrencies;
 use crate::response::currencies::SelectedCurrencies;
+use crate::response::payments::EstimatedPaymentAmount;
 use crate::response::payments::MinPaymentAmount;
+use crate::response::payouts::AllPayouts;
+use crate::response::payouts::Payouts;
 use crate::response::status::Status;
 use anyhow::Result;
 use reqwest::header;
 use reqwest::Client;
 use reqwest::Request;
+use serde_json::Value;
 
 static BASE_URL: &str = "https://api.nowpayments.io/v1/";
 static BASE_SANDBOX_URL: &str = "https://api-sandbox.nowpayments.io/v1/";
@@ -101,7 +107,7 @@ impl NPClient {
         amount: impl Display,
         from: impl Display,
         to: impl Display,
-    ) -> Result<> {
+    ) -> Result<EstimatedPaymentAmount> {
         let path = format!(
             "estimate?amount={}&currency_from={}&currency_to={}",
             amount, from, to
@@ -117,7 +123,8 @@ impl NPClient {
 
         Ok(serde_json::from_str(req.as_str())?)
     }
-
+    
+    // TODO: need jwt
     pub async fn get_list_of_payments(
         &self,
         limit: impl Display,
@@ -136,21 +143,36 @@ impl NPClient {
         Ok(serde_json::from_str(req.as_str())?)
     }
 
+    // TODO
     pub async fn get_balance(&self) -> Result<Status> {
         let req = self.get("balance").await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_payout_status(&self, payout_id: impl Display) -> Result<Currencies> {
+    pub async fn get_payout_status(&self, payout_id: impl Display) -> Result<Payouts> {
         let path = format!("payout/{}", payout_id);
         let req = self.get(path).await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_payout_list(&self) -> Result<Status> {
+    pub async fn get_payout_list(&self) -> Result<AllPayouts> {
         let req = self.get("payout").await?;
+
+        Ok(serde_json::from_str(req.as_str())?)
+    }
+
+    pub async fn get_conversion_status(&self, conversion_id: impl Display) -> Result<SingleConversion> {
+        let path = format!("conversion/{}", conversion_id);
+        let req = self.get(path).await?;
+
+        Ok(serde_json::from_str(req.as_str())?)
+    }
+
+    pub async fn get_conversion_list(&self) -> Result<AllConversions> {
+        let path = format!("conversion");
+        let req = self.get(path).await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }

@@ -78,4 +78,12 @@ mod test {
         // panics if not error
         c.get_min_payment_amount("eth", "btc").await.unwrap();
     }
+
+    #[tokio::test]
+    async fn get_estimate_price() {
+        let c = client();
+
+        // panics if not error
+        c.get_estimated_price(2000, "btc", "eth").await.unwrap();
+    }
 }
