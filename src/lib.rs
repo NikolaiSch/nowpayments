@@ -100,4 +100,11 @@ mod test {
 
         let x = c.get_payout_list().await.unwrap();
     }
+
+    #[tokio::test]
+    async fn create_payment() {
+        let mut c = client();
+        
+        let x = c.create_payment().await.unwrap();
+    }
 }

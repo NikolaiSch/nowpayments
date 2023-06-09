@@ -10,6 +10,7 @@ pub struct JWTJson {
     pub token: String,
 }
 
+#[derive(Debug)]
 pub struct JWT {
     token: Option<String>,
     time: Option<Instant>
