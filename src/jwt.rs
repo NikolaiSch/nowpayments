@@ -21,7 +21,7 @@ impl JWT {
         Self { token: None, time: None }
     }
     pub fn is_expired(&mut self) -> bool {
-        if let None = self.time {
+        if self.time.is_none() {
             return true;
         }
         let duration = Instant::now() - self.time.unwrap();
@@ -32,7 +32,7 @@ impl JWT {
             return true;
         }
 
-        return false;
+        false
     }
 
     pub fn get(&mut self) -> anyhow::Result<String> {
@@ -47,7 +47,7 @@ impl JWT {
         bail!("No jwt yet");
     }
 
-    pub fn set(&mut self, token: String) -> () {
+    pub fn set(&mut self, token: String) {
         self.time = Some(Instant::now());
         self.token = Some(token);
     }

@@ -1,5 +1,5 @@
 use std::fmt::Display;
-use std::{collections::HashMap, fmt::format};
+use std::{collections::HashMap};
 
 use crate::response::{currencies::Currencies, payments::PaymentStatus};
 use crate::response::currencies::FullCurrencies;
@@ -16,9 +16,9 @@ use crate::{
 };
 use anyhow::{bail, Result};
 use reqwest::header;
-use reqwest::Client;
-use reqwest::Request;
-use serde_json::Value;
+
+
+
 
 static BASE_URL: &str = "https://api.nowpayments.io/v1/";
 static BASE_SANDBOX_URL: &str = "https://api-sandbox.nowpayments.io/v1/";
@@ -68,7 +68,7 @@ impl NPClient {
         }
     }
 
-    pub fn set_auth(&mut self, email: String, password: String) -> () {
+    pub fn set_auth(&mut self, email: String, password: String) {
         self.email = Some(email);
         self.password = Some(password);
     }
@@ -90,7 +90,7 @@ impl NPClient {
         endpoint: impl Display,
         data: HashMap<&'static str, String>,
     ) -> Result<String> {
-        let endpoint = format!("{}{}", self.base_url, endpoint.to_string());
+        let endpoint = format!("{}{}", self.base_url, endpoint);
 
         let req = self
             .client
@@ -230,7 +230,7 @@ impl NPClient {
     }
 
     pub async fn get_conversion_list(&mut self) -> Result<AllConversions> {
-        let path = format!("conversion");
+        let path = "conversion".to_string();
         let req = self.get(path).await?;
 
         Ok(serde_json::from_str(req.as_str())?)
@@ -257,14 +257,14 @@ impl PaymentOpts {
         order_id: impl Display,
         order_description: impl Display,
     ) -> Self {
-        return PaymentOpts {
+        PaymentOpts {
             price_amount: price_amount.to_string(),
             price_currency: price_currency.to_string(),
             pay_currency: pay_currency.to_string(),
             ipn_callback_url: ipn_callback_url.to_string(),
             order_id: order_id.to_string(),
             order_description: order_description.to_string(),
-        };
+        }
     }
 }
 
