@@ -4,10 +4,12 @@ pub mod response;
 
 #[cfg(test)]
 mod test {
+    use std::env::var;
+
     use crate::client::PaymentOpts;
 
     use super::client::NPClient;
-    use serde::{Deserialize, Serialize};
+    use miniserde::{Deserialize, Serialize};
 
     #[derive(Deserialize, Serialize)]
     struct Config {
@@ -19,7 +21,12 @@ mod test {
 
     fn parse_config() -> Config {
         dotenvy::dotenv().unwrap();
-        envy::prefixed("NP_").from_env().unwrap()
+        return Config {
+            api: var("NP_KEY").unwrap(),
+            email: var("NP_EMAIL").unwrap(),
+            sandboxapi: var("NP_SANDBOX_KEY").unwrap(),
+            password: var("NP_PASS").unwrap(),
+        } 
     }
 
     fn client() -> NPClient {

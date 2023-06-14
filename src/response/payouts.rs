@@ -1,6 +1,4 @@
-use serde::Deserialize;
-use serde::Serialize;
-use serde_json::Value;
+use miniserde::{Deserialize, Serialize};
 
 pub type Payouts = Vec<Payout>;
 
@@ -14,7 +12,6 @@ pub struct Payout {
     pub status: String,
     pub extra_id: Option<String>,
     pub hash: Option<String>,
-    pub error: Value,
     pub is_request_payouts: bool,
     pub ipn_callback_url: Option<String>,
     pub unique_external_id: Option<String>,

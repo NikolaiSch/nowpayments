@@ -1,5 +1,4 @@
-use serde::Deserialize;
-use serde::Serialize;
+use miniserde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SingleConversion {

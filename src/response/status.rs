@@ -1,5 +1,4 @@
-use serde::Deserialize;
-use serde::Serialize;
+use miniserde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Status {

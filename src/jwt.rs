@@ -2,8 +2,7 @@ use std::time::{Instant, Duration};
 
 use anyhow::bail;
 
-use serde::Deserialize;
-use serde::Serialize;
+use miniserde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JWTJson {
