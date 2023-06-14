@@ -1,8 +1,6 @@
 use anyhow::{bail, Result};
-use envy;
 use nowpayments::client::*;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Deserialize, Serialize)]
 struct Config {
@@ -24,12 +22,12 @@ fn client() -> NPClient {
     client
 }
 
-fn sandbox_client() -> NPClient {
-    let config = parse_config();
-    let mut client = NPClient::new(config.sandboxapi.as_str());
-    client.set_auth(config.email, config.password);
-    client
-}
+// fn sandbox_client() -> NPClient {
+//     let config = parse_config();
+//     let mut client = NPClient::new(config.sandboxapi.as_str());
+//     client.set_auth(config.email, config.password);
+//     client
+// }
 
 async fn create_payment(mut client: NPClient) -> Result<()> {
     let id = uuid::Uuid::new_v4().to_string();

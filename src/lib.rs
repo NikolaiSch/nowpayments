@@ -1,13 +1,12 @@
 pub mod client;
-pub mod response;
 pub mod jwt;
+pub mod response;
 
 #[cfg(test)]
 mod test {
     use crate::client::PaymentOpts;
 
     use super::client::NPClient;
-    use envy;
     use serde::{Deserialize, Serialize};
 
     #[derive(Deserialize, Serialize)]
@@ -15,7 +14,7 @@ mod test {
         api: String,
         sandboxapi: String,
         email: String,
-        password: String
+        password: String,
     }
 
     fn parse_config() -> Config {
@@ -100,15 +99,15 @@ mod test {
         // panics if not error
         c.authenticate().await.unwrap();
 
-        let x = c.get_payout_list().await.unwrap();
+        c.get_payout_list().await.unwrap();
     }
 
     #[tokio::test]
     async fn create_payment() {
-            let payment = PaymentOpts::new(100, "GBP", "BTC", "http://google.com/", "x", "test order");
+        let payment = PaymentOpts::new(100, "GBP", "BTC", "http://google.com/", "x", "test order");
 
         let mut c = client();
-        
-        let x = c.create_payment(payment).await.unwrap();
-    } 
+
+        c.create_payment(payment).await.unwrap();
+    }
 }

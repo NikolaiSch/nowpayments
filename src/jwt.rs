@@ -19,7 +19,8 @@ pub struct JWT {
 impl JWT {
     pub fn new() -> Self {
         Self { token: None, time: None }
-    }
+    } 
+
     pub fn is_expired(&mut self) -> bool {
         if self.time.is_none() {
             return true;
@@ -50,5 +51,11 @@ impl JWT {
     pub fn set(&mut self, token: String) {
         self.time = Some(Instant::now());
         self.token = Some(token);
+    }
+}
+
+impl Default for JWT {
+    fn default() -> Self {
+        JWT::new()
     }
 }
