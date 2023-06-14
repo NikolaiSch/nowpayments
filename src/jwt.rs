@@ -21,22 +21,20 @@ impl JWT {
         Self { token: None, time: None }
     } 
 
-    pub fn is_expired(&mut self) -> bool {
+    pub fn is_expired(&self) -> bool {
         if self.time.is_none() {
             return true;
         }
         let duration = Instant::now() - self.time.unwrap();
 
         if duration >= Duration::from_secs(300) {
-            self.token = None;
-            self.time = None;
             return true;
         }
 
         false
     }
 
-    pub fn get(&mut self) -> anyhow::Result<String> {
+    pub fn get(&self) -> anyhow::Result<String> {
         if self.is_expired() {
             bail!("expired jwt");
         }

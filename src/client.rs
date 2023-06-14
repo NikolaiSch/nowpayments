@@ -70,7 +70,7 @@ impl NPClient {
         self.password = Some(password);
     }
 
-    async fn get(&mut self, endpoint: impl ToString) -> Result<String> {
+    async fn get(&self, endpoint: impl ToString) -> Result<String> {
         let endpoint = format!("{}{}", self.base_url, endpoint.to_string());
 
         let req = self
@@ -83,7 +83,7 @@ impl NPClient {
     }
 
     async fn post(
-        &mut self,
+        &self,
         endpoint: impl Display,
         data: HashMap<&'static str, String>,
     ) -> Result<String> {
@@ -115,32 +115,32 @@ impl NPClient {
 }
 
 impl NPClient {
-    pub async fn status(&mut self) -> Result<Status> {
+    pub async fn status(&self) -> Result<Status> {
         let req = self.get("status").await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_currencies(&mut self) -> Result<Currencies> {
+    pub async fn get_currencies(&self) -> Result<Currencies> {
         let req = self.get("currencies").await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_full_currencies(&mut self) -> Result<FullCurrencies> {
+    pub async fn get_full_currencies(&self) -> Result<FullCurrencies> {
         let req = self.get("full-currencies").await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_checked_currencies(&mut self) -> Result<SelectedCurrencies> {
+    pub async fn get_checked_currencies(&self) -> Result<SelectedCurrencies> {
         let req = self.get("merchant/coins").await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
     // TODO
     pub async fn get_min_payment_amount(
-        &mut self,
+        &self,
         from: impl Display,
         to: impl Display,
     ) -> Result<MinPaymentAmount> {
@@ -151,7 +151,7 @@ impl NPClient {
     }
     // TODO
     pub async fn get_estimated_price(
-        &mut self,
+        &self,
         amount: impl Display,
         from: impl Display,
         to: impl Display,
@@ -165,7 +165,7 @@ impl NPClient {
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_payment_status(&mut self, payment_id: impl Display) -> Result<PaymentStatus> {
+    pub async fn get_payment_status(&self, payment_id: impl Display) -> Result<PaymentStatus> {
         if self.jwt.is_expired() {
             bail!("Expired jwt");
         }
@@ -176,7 +176,7 @@ impl NPClient {
     }
 
     pub async fn get_list_of_payments(
-        &mut self,
+        &self,
         limit: impl Display,
         page: impl Display,
         sort_by: impl Display,
@@ -197,27 +197,27 @@ impl NPClient {
     }
 
     // TODO
-    pub async fn get_balance(&mut self) -> Result<Status> {
+    pub async fn get_balance(&self) -> Result<Status> {
         let req = self.get("balance").await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_payout_status(&mut self, payout_id: impl Display) -> Result<Payouts> {
+    pub async fn get_payout_status(&self, payout_id: impl Display) -> Result<Payouts> {
         let path = format!("payout/{}", payout_id);
         let req = self.get(path).await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_payout_list(&mut self) -> Result<AllPayouts> {
+    pub async fn get_payout_list(&self) -> Result<AllPayouts> {
         let req = self.get("payout").await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
     pub async fn get_conversion_status(
-        &mut self,
+        &self,
         conversion_id: impl Display,
     ) -> Result<SingleConversion> {
         let path = format!("conversion/{}", conversion_id);
@@ -226,7 +226,7 @@ impl NPClient {
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_conversion_list(&mut self) -> Result<AllConversions> {
+    pub async fn get_conversion_list(&self) -> Result<AllConversions> {
         let path = "conversion".to_string();
         let req = self.get(path).await?;
 
@@ -270,7 +270,7 @@ impl PaymentOpts {
 
 
 impl NPClient {
-    pub async fn create_payment(&mut self, opts: PaymentOpts) -> Result<Payment> {
+    pub async fn create_payment(&self, opts: PaymentOpts) -> Result<Payment> {
         let mut h = HashMap::new();
         h.insert("price_amount", opts.price_amount.clone());
         h.insert("price_currency", opts.price_currency.clone());
