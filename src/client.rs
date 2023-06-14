@@ -1,8 +1,7 @@
 use std::fmt::Display;
 use std::{collections::HashMap, fmt::format};
 
-use crate::response::{conversion::SingleConversion, payments::Payment};
-use crate::response::currencies::Currencies;
+use crate::response::{currencies::Currencies, payments::PaymentStatus};
 use crate::response::currencies::FullCurrencies;
 use crate::response::currencies::SelectedCurrencies;
 use crate::response::payments::EstimatedPaymentAmount;
@@ -10,6 +9,7 @@ use crate::response::payments::MinPaymentAmount;
 use crate::response::payouts::AllPayouts;
 use crate::response::payouts::Payouts;
 use crate::response::status::Status;
+use crate::response::{conversion::SingleConversion, payments::Payment};
 use crate::{
     jwt::{JWTJson, JWT},
     response::conversion::AllConversions,
@@ -168,14 +168,16 @@ impl NPClient {
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    pub async fn get_payment_status(&mut self, payment_id: impl Display) -> Result<Currencies> {
+    pub async fn get_payment_status(&mut self, payment_id: impl Display) -> Result<PaymentStatus> {
+        if self.jwt.is_expired() {
+            bail!("Expired jwt");
+        }
         let path = format!("payment/{}", payment_id);
         let req = self.get(path).await?;
 
         Ok(serde_json::from_str(req.as_str())?)
     }
 
-    // TODO: need jwt
     pub async fn get_list_of_payments(
         &mut self,
         limit: impl Display,
@@ -184,7 +186,10 @@ impl NPClient {
         order_by: impl Display,
         date_from: impl Display,
         date_to: impl Display,
-    ) -> Result<Currencies> {
+    ) -> Result<Payment> {
+        if self.jwt.is_expired() {
+            bail!("Expired jwt");
+        }
         let path = format!(
             "payment/?limit={}&page={}&sortBy={}&orderBy={}&dateFrom={}&dateTo={}",
             limit, page, sort_by, order_by, date_from, date_to
@@ -232,15 +237,51 @@ impl NPClient {
     }
 }
 
+
+pub struct PaymentOpts {
+    price_amount: String,
+    price_currency: String,
+    pay_currency: String,
+    ipn_callback_url: String,
+    order_id: String,
+    order_description: String,
+}
+
+
+impl PaymentOpts {
+    pub fn new(
+        price_amount: u32,
+        price_currency: impl Display,
+        pay_currency: impl Display,
+        ipn_callback_url: impl Display,
+        order_id: impl Display,
+        order_description: impl Display,
+    ) -> Self {
+        return PaymentOpts {
+            price_amount: price_amount.to_string(),
+            price_currency: price_currency.to_string(),
+            pay_currency: pay_currency.to_string(),
+            ipn_callback_url: ipn_callback_url.to_string(),
+            order_id: order_id.to_string(),
+            order_description: order_description.to_string(),
+        };
+    }
+}
+
+
+
+
+
 impl NPClient {
-    pub async fn create_payment(&mut self) -> Result<Payment> {
+    pub async fn create_payment(&mut self, opts: PaymentOpts) -> Result<Payment> {
         let mut h = HashMap::new();
-        h.insert("price_amount", "300".to_string());
-        h.insert("price_currency", "gbp".to_string());
-        h.insert("pay_currency", "btc".to_string());
-        h.insert("ipn_callback_url", "http://google.com".to_string());
-        h.insert("order_id", "10".to_string());
-        h.insert("order_description", "300".to_string());
+        h.insert("price_amount", opts.price_amount.clone());
+        h.insert("price_currency", opts.price_currency.clone());
+        h.insert("pay_currency", opts.pay_currency.clone());
+        h.insert("ipn_callback_url", opts.ipn_callback_url.clone());
+        h.insert("order_id", opts.order_id.clone());
+        h.insert("order_description", opts.order_description.clone());
+        
 
         let x = self.post("payment", h).await?;
 

@@ -4,6 +4,8 @@ pub mod jwt;
 
 #[cfg(test)]
 mod test {
+    use crate::client::PaymentOpts;
+
     use super::client::NPClient;
     use envy;
     use serde::{Deserialize, Serialize};
@@ -103,8 +105,10 @@ mod test {
 
     #[tokio::test]
     async fn create_payment() {
+            let payment = PaymentOpts::new(100, "GBP", "BTC", "http://google.com/", "x", "test order");
+
         let mut c = client();
         
-        let x = c.create_payment().await.unwrap();
-    }
+        let x = c.create_payment(payment).await.unwrap();
+    } 
 }

@@ -31,3 +31,17 @@ pub struct Payment {
     pub purchase_id: String,
 }
 
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct PaymentStatus {
+    pub payment_id: u64,
+    pub payment_status: String,
+    pub pay_address: String,
+    pub price_amount: f64,
+    pub price_currency: String,
+    pub pay_amount: f64,
+    pub pay_currency: String,
+    pub order_id: String,
+    pub order_description: String,
+    pub purchase_id: u64,
+}
+
