@@ -20,7 +20,7 @@ use reqwest::header;
 
 static BASE_URL: &str = "https://api.nowpayments.io/v1/";
 static BASE_SANDBOX_URL: &str = "https://api-sandbox.nowpayments.io/v1/";
-static USERAGENT: &str = concat!("rust/nowpayments/", "0.1.0");
+static USERAGENT: &str = concat!("rust/nowpayments/", "0.2.2");
 
 pub struct NPClient {
     base_url: &'static str,
